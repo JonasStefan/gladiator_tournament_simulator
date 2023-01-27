@@ -2,204 +2,50 @@
 <html>
 <head>
     <title>tournament simulation</title>
-    <style>
-        h1 {
-            color: gray;
-            text-align: center;
-            font-size: 60px;
-        }
-
-        body {
-            background-color: lightblue;
-        }
-
-        p.log {
-            text-decoration-line: underline;
-            font-size: 30px;
-            color: gray;
-            text-align: center;
-        }
-
-        ul {
-            width: 75%;
-            margin-left: 11.5%;
-            border-style: solid;
-            border-width: 2px;
-            border-color: gray;
-            border-radius: 5px;
-            
-        }
-
-        li {
-            width: 45%;
-            border-bottom: 1px solid gray;
-            font-size: 20px;
-        }
-
-        p.text {
-            font-size: 18px;
-        }
-
-    </style>
+    <link href="style.css" rel="stylesheet">
 </head>
 
 <body>
     <h1>tournament simulation</h1>
-    <p class="text">How many players should participate in this fight (it only works properly with a power of 2!):</p>
-    <input type="number" title="a power of 2 (2, 4, 8, 16, 32, ...)">
-    <button id="enter">enter</button>
-    <button id="reset">reset</button>
+    <div class="parentDiv">
+        <div>
+
+        </div>
+        <div class="leftDiv">
+            <p class="text" id="big">How many players should participate?<br>(pls use a power of 2)</p>
+            <button id="reset" onclick="resetButtonHandler()">reset</button>
+            <input type="number" title="a power of 2 (2, 4, 8, 16, 32, ...)" onkeydown="fighterInputHandler(this)" placeholder="2, 4, 8, 16, 32, 64, ...">
+        </div>
+        <div class="align-right" id="padding">
+            <p id="big">Change the names in the name list</p>
+            <button id="resetListButton" onclick="nameListButtonHandler(this)">clear the list</button>
+            <button id="defaultListButton" onclick="nameListButtonHandler(this)">set to default</button>
+            <input id="listInput" onkeydown="nameListInputHandler(this)" placeholder="name">
+            <p id="big">Change the max health</p>
+            <button id="resetHpButton" onclick="resetMaxHpButtonHandler()">set to default</button>
+            <input id="hpInput" type="number" onkeydown="maxHpInputHandler(this)" placeholder="100">
+        </div>
+        <div class="rightDiv" id="padding">
+            <p id="big">Change the max damage</p>
+            <input id="dmgInput" type="number" onkeydown="maxDmgInputHandler(this)" placeholder="20">
+            <button id="resetDmgButton" onclick="resetMaxDmgButtonHandler()">set to default</button>
+            <p id="big">change the max hp regenerated per regeneration</p>
+            <input id="regenInput" type="number" onkeydown="maxRegenInputHandler(this)" placeholder="6">
+            <button id="resetRegenButton" onclick="resetMaxRegenButtonHandler()">set to default</button>
+        </div>
+        <div>
+
+        </div>
+        <div class="align-left" id="winnerLog">
+            <p id="big">current winner:</p>
+        </div>
+    </div>
     <p class="log">combat log:</p>
     <ul id="log">
     </ul>
 </body>
 
-<script>
-
-    let nameList = ["Guenther", "Ferdinand", "Maximilian", "Elias", "Gabse", "Paul", "Raffi", "The Rock", "Logan Paul", "Caillou", "Francesco", "Iron Golem", "Luise", "Sigurd", "DiMonte", "Jeremias", "Renegaide Raider", "Mario", "Super Mario", "Bowser", "Creeper", "'awww man'", "Wince11", "Englxnd", "obuth", "Mandi", "Artua Morgan", "Rüdiger", "Franz Dietrich", "Helmut", "Herbert", "Leopoldine", "Wilhelmine", "Gisela", "Olga", "Ludmilla", "Rudolfine", "Victor", "Adalbert", "Albrecht", "Willibald", "Raimund", "Arnold", "Reinhold", "Rolf", "Leonhard", "Dionysius", "Crescentia", "Agatha", "Apollonia"];
-    let participants;
-    let fighterList = [];
-    let deadFighters = [];
-    let currentRound = 1;
-
-    function add_to_combat_log(msg){
-        var node = document.createElement("li");
-        node.appendChild(document.createTextNode(msg));
-        document.querySelector("ul").appendChild(node);
-
-    }
-
-    function resetButtonHandler(){
-        while(document.getElementById("log").children.length > 0){
-            for(let i = 0; i < document.getElementById("log").children.length; i++){
-                document.getElementById("log").children[i].remove();
-
-            }
-        }
-
-    }
-
-    function buttonHandler(){
-        fighterList = [];
-        deadFighters = [];
-        currentRound = 1;
-
-        if(document.getElementsByTagName("input")[0].value == ""){
-            alert("Please write a number in the input field");
-            return;
-        }
-
-        participants = document.getElementsByTagName("input")[0].value;
-
-        for(let i = 0; i < participants; i++){
-            fighterList.push(new Fighter(i));
-
-        }
-
-
-        while(true){
-            for(let i = 0; i < fighterList.length; i += 2){
-                let fighter1 = fighterList[i];
-                let fighter2 = fighterList[i + 1];
-
-                add_to_combat_log(`${currentRound}. round: ${fighter1.name} vs. ${fighter2.name}!`);
-
-                while(true){
-                    if(fighter1.dead == false && fighter2.dead == false){
-                        if(15 > Math.floor(Math.random() * 101)){
-                            fighter1.regen();
-
-                        }else{
-                            fighter1.attack(fighter2);
-
-                        }
-
-                    }else{
-                        break;
-
-                    }
-
-                    if(fighter2.dead == false){
-                        if(15 > Math.floor(Math.random() * 101)){
-                            fighter2.regen();
-
-                        }else{
-                            fighter2.attack(fighter1);
-
-                        }
-                        
-                    }else{
-                        break;
-
-                    }
-                }
-
-                currentRound += 1;
-
-            }
-            
-            for(let i = 0; i < deadFighters.length; i++){
-                fighterList.splice(fighterList.indexOf(deadFighters[i]), 1);
-
-            }
-
-            deadFighters = [];
-
-            if(fighterList.length == 1){
-                add_to_combat_log(`${fighterList[0].name} has won the game!`);
-                add_to_combat_log("");
-                add_to_combat_log("stats:");
-                add_to_combat_log(`damage: ${fighterList[0].dmg}`);
-                add_to_combat_log(`hp left: ${fighterList[0].hp}`);
-                add_to_combat_log(`dodgechance: ${fighterList[0].dodgeChance}%`);
-                add_to_combat_log(`hp per regen: ${fighterList[0].regenVal}`);
-                break;
-
-            }else{
-                add_to_combat_log("");
-                add_to_combat_log("batch completed, starting new one:");
-                add_to_combat_log("");
-            }
-
-        }
-    }
-
-    class Fighter{
-        constructor(index){
-            this.dmg = Math.floor((Math.random() * 20) + 1);
-            this.hp = Math.floor((Math.random() * 51) + 50);
-            this.dodgeChance = Math.floor(Math.random() * 11);
-            this.regenVal = Math.floor(Math.random() * 6);
-            this.name = nameList[Math.floor(Math.random() * nameList.length)];
-            this.dead = false;
-            this.listIndex = index;
-        }
-
-        attack(enemy){
-            if(enemy.dodgeChance > Math.floor(Math.random() * 101)){
-                return;
-
-            }else if(enemy.hp - this.dmg <= 0){
-                add_to_combat_log(`${enemy.name} is dead! ${this.name} survived with ${this.hp} hp left!`);
-                enemy.dead = true;
-                deadFighters.push(enemy);
-
-            }else{
-                enemy.hp -= this.dmg;
-
-            }
-            
-        }
-
-        regen(){
-            this.hp += this.regenVal;
-
-        }
-
-    }
-
-    document.getElementById("enter").onclick = buttonHandler;
-    document.getElementById("reset").onclick = resetButtonHandler;
-
+<script src="script.js">
+    
 </script>
 </html>
